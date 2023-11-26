@@ -4,6 +4,9 @@ import convertStringNumber from "./convertStringNumber.js";
 
 const financeForm = document.querySelector('.finance__form');
 const financeAmount = document.querySelector('.finance__amount');
+const financeReport = document.querySelector('.finance__report');
+const report = document.querySelector('.report');
+const reportClose = document.querySelector('.report__close');
 
 let amount = 0
 
@@ -26,4 +29,12 @@ financeForm.addEventListener('submit', (event) => {
 
   financeAmount.textContent = `${amount.toLocaleString()} ₽`
 
+})
+
+financeReport.addEventListener('click', (event) => {
+  report.classList.add('report__open')
+})
+
+reportClose.addEventListener('click', () => {
+  report.classList.remove('report__open')
 })
