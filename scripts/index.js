@@ -31,10 +31,17 @@ financeForm.addEventListener('submit', (event) => {
 
 })
 
-financeReport.addEventListener('click', (event) => {
-  report.classList.add('report__open')
-})
+const closeReport = ({ target }) => {
+  if (target.closest('.report__close') || (!target.closest('.report') && target !== financeReport)) {
+    report.classList.remove('report__open')
+    document.removeEventListener('click', closeReport)
+  }
+};
 
-reportClose.addEventListener('click', () => {
-  report.classList.remove('report__open')
-})
+const openReport = () => {
+  report.classList.add('report__open')
+
+  document.addEventListener('click', closeReport)
+};
+
+financeReport.addEventListener('click', openReport)
