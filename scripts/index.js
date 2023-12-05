@@ -1,6 +1,7 @@
 'use strict'
 
 import convertStringNumber from "./convertStringNumber.js";
+import reformatDate from "./reformatDate.js";
 
 const financeForm = document.querySelector('.finance__form');
 const financeAmount = document.querySelector('.finance__amount');
@@ -35,7 +36,7 @@ financeForm.addEventListener('submit', (event) => {
     amount -= changeAmount
   }
 
-  financeAmount.textContent = `${amount.toLocaleString()} ₽`
+  financeAmount.textContent = `${amount.toLocaleString('Ru-ru')} ₽`
 })
 
 const getData = async(url) => {
@@ -54,19 +55,31 @@ const getData = async(url) => {
 
 const closeReport = ({ target }) => {
   if (target.closest('.report__close') || (!target.closest('.report') && target !== financeReport)) {
-    report.classList.remove('report__open')
+    gsap.to(report, {
+      opacity: 0,
+      scale: 0,
+      duration: 0.5,
+      ease: 'expo.in',
+      onComplete() {
+        report.style.visibility = 'hidden'
+      } 
+    })
+
     document.removeEventListener('click', closeReport)
   }
 };
 
 const openReport = () => {
-  report.classList.add('report__open')
-  document.addEventListener('click', closeReport)
-};
+  report.style.visibility = 'visible'
 
-const reformatDate = (dateStr) => {
-  const [year, month, day] = dateStr.split('-')
-  return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`
+  gsap.to(report, {
+    opacity: 1,
+    scale: 1,
+    duration: 0.5,
+    ease: 'expo.out',
+  })
+
+  document.addEventListener('click', closeReport)
 };
 
 const renderReport = (data) => {
@@ -95,9 +108,16 @@ const renderReport = (data) => {
 };
 
 financeReport.addEventListener('click', async () => {
-  openReport()
+  const textContent = financeReport.textContent
+  financeReport.textContent = 'Загрузка'
+  financeReport.disabled = true
+
   const data = await getData('/test')
+
+  financeReport.textContent = textContent
+  financeReport.disabled = false
   renderReport(data)
+  openReport()
 })
 
 reportDates.addEventListener('submit', async(event) => {
