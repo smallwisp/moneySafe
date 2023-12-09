@@ -1,4 +1,5 @@
 import { convertStringNumber } from "./hepler.js";
+import { getData, postData } from "./service.js";
 
 const financeForm = document.querySelector('.finance__form');
 const financeAmount = document.querySelector('.finance__amount');
@@ -7,13 +8,17 @@ let amount = 0
 
 financeAmount.textContent = amount
 
-export const financeControl = () => {
-  financeForm.addEventListener('submit', (event) => {
+const addNewOperation = async(event) => {
     event.preventDefault()
   
     const typeOperation = event.submitter.dataset.typeOperation
+
+    const financeFormDate = Object.fromEntries(new FormData(financeForm))
+    financeFormDate.type = typeOperation
+
+    const newOperation = await postData('/finance', financeFormDate)
     
-    const changeAmount = Math.abs(convertStringNumber(financeForm.amount.value))
+    const changeAmount = Math.abs(convertStringNumber(newOperation.amount))
     
     if (typeOperation === 'income') {
       amount += changeAmount
@@ -24,5 +29,26 @@ export const financeControl = () => {
     }
   
     financeAmount.textContent = `${amount.toLocaleString('Ru-ru')} ₽`
-  })
+    financeForm.reset()
+}
+
+
+export const financeControl = async() => {
+  const operations = await getData('/finance')
+
+  amount = operations.reduce((acc, item) => {
+    if (item.type === 'income') {
+      acc += convertStringNumber(item.amount)
+    }
+
+    if (item.type === 'expenses') {
+      acc -= convertStringNumber(item.amount)
+    }
+
+    return acc
+  }, 0)
+
+  financeAmount.textContent = `${amount.toLocaleString('Ru-ru')} ₽`
+
+  financeForm.addEventListener('submit', addNewOperation)
 };
