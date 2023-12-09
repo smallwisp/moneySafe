@@ -1,3 +1,6 @@
+import { reformatDate } from "./hepler.js";
+import { getData } from "./service.js";
+
 const financeReport = document.querySelector('.finance__report');
 const report = document.querySelector('.report');
 const reportOperationList = document.querySelector('.report__operation-list');
@@ -100,5 +103,5 @@ export const reportControl = () => {
     const data = await getData(url)
     renderReport(data)
   
-  })
+  }) 
 }
