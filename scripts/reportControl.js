@@ -67,21 +67,31 @@ const renderReport = (data) => {
 };
 
 export const reportControl = () => {
-  reportOperationList.addEventListener('click', ({target}) => {
-    console.log(target.dataset.id);
-  })
-
+  let data
   financeReport.addEventListener('click', async () => {
     const textContent = financeReport.textContent
     financeReport.textContent = 'Загрузка'
     financeReport.disabled = true
   
-    const data = await getData('/finance')
-  
+    data = await getData('/finance')
+    
     financeReport.textContent = textContent
     financeReport.disabled = false
     renderReport(data)
+    console.log('data: ', data);
+    
     openReport()
+  })
+
+  reportOperationList.addEventListener('click', ({target}) => {
+    if (target.dataset.id) {
+      data.forEach((item, index) => {
+        if (item.id === target.dataset.id) {
+          data.splice(index, 1)
+        }
+      })
+      renderReport(data)
+    }
   })
   
   reportDates.addEventListener('submit', async(event) => {
